@@ -1,0 +1,874 @@
+<!DOCTYPE html>
+<html lang="zh-CN">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>北京五日游旅行计划 - 6.17-6.21</title>
+    
+    <!-- 样式库 -->
+    <link rel="stylesheet" href="https://lf3-cdn-tos.bytecdntp.com/cdn/expire-1-M/tailwindcss/2.2.19/tailwind.min.css">
+    <link rel="stylesheet" href="https://lf6-cdn-tos.bytecdntp.com/cdn/expire-100-M/font-awesome/6.0.0/css/all.min.css">
+    <link rel="stylesheet" href="https://fonts.googleapis.com/css2?family=Noto+Serif+SC:wght@400;500;600;700&family=Noto+Sans+SC:wght@300;400;500;700&display=swap">
+    <link rel="stylesheet" href="https://unpkg.com/leaflet@1.9.4/dist/leaflet.css" integrity="sha256-p4NxAoJBhIIN+hmNHrzRCf9tD/miZyoHS5obTRR9BMY=" crossorigin=""/>
+    
+    <style>
+        :root {
+            --primary-color: #2563eb;
+            --secondary-color: #f59e0b;
+            --accent-color: #dc2626;
+            --text-dark: #1f2937;
+            --text-light: #6b7280;
+            --bg-light: #f9fafb;
+            --shadow-sm: 0 1px 2px 0 rgb(0 0 0 / 0.05);
+            --shadow-md: 0 4px 6px -1px rgb(0 0 0 / 0.1);
+            --shadow-lg: 0 10px 15px -3px rgb(0 0 0 / 0.1);
+        }
+
+        body {
+            font-family: 'Noto Sans SC', sans-serif;
+            background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
+            min-height: 100vh;
+        }
+
+        .hero-section {
+            background: linear-gradient(rgba(0,0,0,0.4), rgba(0,0,0,0.4)), 
+                        url('data:image/svg+xml,<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 1200 600"><defs><linearGradient id="bg" x1="0%" y1="0%" x2="100%" y2="100%"><stop offset="0%" style="stop-color:%23ff6b35;stop-opacity:1" /><stop offset="100%" style="stop-color:%23f7931e;stop-opacity:1" /></linearGradient></defs><rect width="1200" height="600" fill="url(%23bg)"/></svg>');
+            background-size: cover;
+            background-position: center;
+        }
+
+        .card {
+            background: white;
+            border-radius: 16px;
+            box-shadow: var(--shadow-lg);
+            transition: transform 0.3s ease, box-shadow 0.3s ease;
+        }
+
+        .card:hover {
+            transform: translateY(-4px);
+            box-shadow: 0 20px 25px -5px rgb(0 0 0 / 0.1);
+        }
+
+        .day-card {
+            border-left: 4px solid var(--primary-color);
+        }
+
+        .location-link {
+            color: var(--primary-color);
+            text-decoration: none;
+            font-weight: 500;
+            border-bottom: 1px dotted var(--primary-color);
+            transition: all 0.3s ease;
+        }
+
+        .location-link:hover {
+            color: var(--accent-color);
+            border-bottom-color: var(--accent-color);
+        }
+
+        .timeline {
+            position: relative;
+        }
+
+        .timeline::before {
+            content: '';
+            position: absolute;
+            left: 20px;
+            top: 0;
+            bottom: 0;
+            width: 2px;
+            background: linear-gradient(to bottom, var(--primary-color), var(--secondary-color));
+        }
+
+        .timeline-item {
+            position: relative;
+            padding-left: 50px;
+            margin-bottom: 20px;
+        }
+
+        .timeline-item::before {
+            content: '';
+            position: absolute;
+            left: 12px;
+            top: 8px;
+            width: 16px;
+            height: 16px;
+            border-radius: 50%;
+            background: var(--primary-color);
+            border: 3px solid white;
+            box-shadow: var(--shadow-sm);
+        }
+
+        .map-container {
+            height: 400px;
+            border-radius: 12px;
+            overflow: hidden;
+            box-shadow: var(--shadow-md);
+        }
+
+        @media (max-width: 768px) {
+            .hero-section {
+                padding: 2rem 1rem;
+            }
+            
+            .card {
+                margin: 1rem;
+            }
+        }
+    </style>
+</head>
+<body>
+    <!-- Hero Section -->
+    <div class="hero-section text-white">
+        <div class="container mx-auto px-4 py-16 text-center">
+            <div class="max-w-4xl mx-auto">
+                <h1 class="text-4xl md:text-6xl font-bold mb-4" style="font-family: 'Noto Serif SC', serif;">
+                    <i class="fas fa-map-marked-alt mr-4 text-yellow-400"></i>
+                    北京文化探索之旅
+                </h1>
+                <div class="text-xl md:text-2xl mb-6 opacity-90">
+                    2024年6月17日 - 6月21日 · 5天4夜 · 3人游
+                </div>
+                <div class="flex flex-wrap justify-center items-center gap-6 text-lg">
+                    <div class="flex items-center">
+                        <i class="fas fa-calendar-alt mr-2 text-yellow-400"></i>
+                        6月中旬，初夏时节
+                    </div>
+                    <div class="flex items-center">
+                        <i class="fas fa-thermometer-half mr-2 text-yellow-400"></i>
+                        温度适宜，阳光明媚
+                    </div>
+                    <div class="flex items-center">
+                        <i class="fas fa-users mr-2 text-yellow-400"></i>
+                        3人小团，深度体验
+                    </div>
+                </div>
+            </div>
+        </div>
+    </div>
+
+    <div class="container mx-auto px-4 py-8">
+        <!-- 行程概览 -->
+        <div class="card p-8 mb-8">
+            <h2 class="text-3xl font-bold mb-6 text-center" style="color: var(--text-dark);">
+                <i class="fas fa-route mr-3 text-blue-500"></i>
+                行程概览
+            </h2>
+            <div class="grid grid-cols-1 md:grid-cols-5 gap-4">
+                <div class="text-center p-4 bg-blue-50 rounded-lg">
+                    <div class="text-2xl font-bold text-blue-600">6.17</div>
+                    <div class="text-sm text-gray-600">抵达日</div>
+                    <div class="mt-2">
+                        <i class="fas fa-plane text-blue-500"></i>
+                        <div class="text-xs mt-1">休整适应</div>
+                    </div>
+                </div>
+                <div class="text-center p-4 bg-red-50 rounded-lg">
+                    <div class="text-2xl font-bold text-red-600">6.18</div>
+                    <div class="text-sm text-gray-600">古都探秘</div>
+                    <div class="mt-2">
+                        <i class="fas fa-landmark text-red-500"></i>
+                        <div class="text-xs mt-1">天安门·故宫</div>
+                    </div>
+                </div>
+                <div class="text-center p-4 bg-green-50 rounded-lg">
+                    <div class="text-2xl font-bold text-green-600">6.19</div>
+                    <div class="text-sm text-gray-600">皇家园林</div>
+                    <div class="mt-2">
+                        <i class="fas fa-tree text-green-500"></i>
+                        <div class="text-xs mt-1">颐和园·清华</div>
+                    </div>
+                </div>
+                <div class="text-center p-4 bg-purple-50 rounded-lg">
+                    <div class="text-2xl font-bold text-purple-600">6.20</div>
+                    <div class="text-sm text-gray-600">毕业庆典</div>
+                    <div class="mt-2">
+                        <i class="fas fa-graduation-cap text-purple-500"></i>
+                        <div class="text-xs mt-1">典礼·长城</div>
+                    </div>
+                </div>
+                <div class="text-center p-4 bg-yellow-50 rounded-lg">
+                    <div class="text-2xl font-bold text-yellow-600">6.21</div>
+                    <div class="text-sm text-gray-600">文化收官</div>
+                    <div class="mt-2">
+                        <i class="fas fa-star text-yellow-500"></i>
+                        <div class="text-xs mt-1">艺术·购物</div>
+                    </div>
+                </div>
+            </div>
+        </div>
+
+        <!-- 详细行程 -->
+        <div class="space-y-8">
+            <!-- 第一天 6.17 -->
+            <div class="card day-card">
+                <div class="p-6">
+                    <div class="flex items-center mb-6">
+                        <div class="bg-blue-500 text-white rounded-full w-12 h-12 flex items-center justify-center mr-4">
+                            <span class="font-bold">D1</span>
+                        </div>
+                        <div>
+                            <h3 class="text-2xl font-bold text-gray-800">6月17日 (周一) - 初抵京城</h3>
+                            <p class="text-gray-600">从北京交通大学出发，初步感受首都魅力</p>
+                        </div>
+                    </div>
+                    
+                    <div class="timeline">
+                        <div class="timeline-item">
+                            <div class="bg-gray-50 p-4 rounded-lg">
+                                <div class="flex justify-between items-start mb-2">
+                                    <h4 class="font-semibold text-lg">14:00 - 抵达北京交通大学</h4>
+                                    <span class="text-sm text-gray-500 bg-blue-100 px-2 py-1 rounded">出发点</span>
+                                </div>
+                                <p class="text-gray-600 mb-2">办理入住手续，熟悉校园环境</p>
+                                <div class="text-sm text-gray-500">
+                                    <i class="fas fa-map-marker-alt mr-1"></i>
+                                    <a href="#" class="location-link" onclick="openNavigation('北京交通大学', '39.958856,116.355103')">北京交通大学</a>
+                                </div>
+                            </div>
+                        </div>
+                        
+                        <div class="timeline-item">
+                            <div class="bg-gray-50 p-4 rounded-lg">
+                                <div class="flex justify-between items-start mb-2">
+                                    <h4 class="font-semibold text-lg">16:00 - 前门大街漫步</h4>
+                                    <span class="text-sm text-gray-500 bg-yellow-100 px-2 py-1 rounded">文化体验</span>
+                                </div>
+                                <p class="text-gray-600 mb-2">体验老北京传统商业街，品尝地道小吃</p>
+                                <div class="text-sm text-gray-500 space-y-1">
+                                    <div><i class="fas fa-map-marker-alt mr-1"></i>
+                                    <a href="#" class="location-link" onclick="openNavigation('前门大街', '39.896844,116.396026')">前门大街</a></div>
+                                    <div><i class="fas fa-subway mr-1"></i> 地铁2号线前门站</div>
+                                    <div><i class="fas fa-clock mr-1"></i> 预计游览2小时</div>
+                                </div>
+                            </div>
+                        </div>
+                        
+                        <div class="timeline-item">
+                            <div class="bg-gray-50 p-4 rounded-lg">
+                                <div class="flex justify-between items-start mb-2">
+                                    <h4 class="font-semibold text-lg">19:00 - 全聚德烤鸭晚餐</h4>
+                                    <span class="text-sm text-gray-500 bg-red-100 px-2 py-1 rounded">特色美食</span>
+                                </div>
+                                <p class="text-gray-600 mb-2">品尝正宗北京烤鸭，开启美食之旅</p>
+                                <div class="text-sm text-gray-500 space-y-1">
+                                    <div><i class="fas fa-map-marker-alt mr-1"></i>
+                                    <a href="#" class="location-link" onclick="openNavigation('全聚德前门店', '39.897123,116.394566')">全聚德前门店</a></div>
+                                    <div><i class="fas fa-money-bill-wave mr-1"></i> 预算：300-400元/人</div>
+                                </div>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+            </div>
+
+            <!-- 第二天 6.18 -->
+            <div class="card day-card">
+                <div class="p-6">
+                    <div class="flex items-center mb-6">
+                        <div class="bg-red-500 text-white rounded-full w-12 h-12 flex items-center justify-center mr-4">
+                            <span class="font-bold">D2</span>
+                        </div>
+                        <div>
+                            <h3 class="text-2xl font-bold text-gray-800">6月18日 (周二) - 古都探秘之旅</h3>
+                            <p class="text-gray-600">天安门广场、故宫博物院，感受帝都千年文化</p>
+                        </div>
+                    </div>
+                    
+                    <div class="timeline">
+                        <div class="timeline-item">
+                            <div class="bg-gray-50 p-4 rounded-lg">
+                                <div class="flex justify-between items-start mb-2">
+                                    <h4 class="font-semibold text-lg">06:30 - 天安门广场观升旗</h4>
+                                    <span class="text-sm text-gray-500 bg-red-100 px-2 py-1 rounded">必看仪式</span>
+                                </div>
+                                <p class="text-gray-600 mb-2">观看庄严的升旗仪式，感受爱国情怀</p>
+                                <div class="text-sm text-gray-500 space-y-1">
+                                    <div><i class="fas fa-map-marker-alt mr-1"></i>
+                                    <a href="#" class="location-link" onclick="openNavigation('天安门广场', '39.903847,116.391548')">天安门广场</a></div>
+                                    <div><i class="fas fa-subway mr-1"></i> 地铁1号线天安门东站</div>
+                                    <div><i class="fas fa-exclamation-triangle mr-1 text-yellow-500"></i> 需提前预约，6月升旗时间约5:10</div>
+                                </div>
+                            </div>
+                        </div>
+                        
+                        <div class="timeline-item">
+                            <div class="bg-gray-50 p-4 rounded-lg">
+                                <div class="flex justify-between items-start mb-2">
+                                    <h4 class="font-semibold text-lg">08:00 - 毛主席纪念堂参观</h4>
+                                    <span class="text-sm text-gray-500 bg-gray-100 px-2 py-1 rounded">红色教育</span>
+                                </div>
+                                <p class="text-gray-600 mb-2">瞻仰伟人遗容，缅怀历史功绩</p>
+                                <div class="text-sm text-gray-500 space-y-1">
+                                    <div><i class="fas fa-map-marker-alt mr-1"></i>
+                                    <a href="#" class="location-link" onclick="openNavigation('毛主席纪念堂', '39.901176,116.391627')">毛主席纪念堂</a></div>
+                                    <div><i class="fas fa-ticket-alt mr-1"></i> 免费参观，需身份证</div>
+                                    <div><i class="fas fa-clock mr-1"></i> 开放时间：8:00-12:00</div>
+                                </div>
+                            </div>
+                        </div>
+                        
+                        <div class="timeline-item">
+                            <div class="bg-gray-50 p-4 rounded-lg">
+                                <div class="flex justify-between items-start mb-2">
+                                    <h4 class="font-semibold text-lg">09:30 - 人民大会堂外观</h4>
+                                    <span class="text-sm text-gray-500 bg-blue-100 px-2 py-1 rounded">建筑艺术</span>
+                                </div>
+                                <p class="text-gray-600 mb-2">欣赏新中国建筑经典，拍照留念</p>
+                                <div class="text-sm text-gray-500 space-y-1">
+                                    <div><i class="fas fa-map-marker-alt mr-1"></i>
+                                    <a href="#" class="location-link" onclick="openNavigation('人民大会堂', '39.904030,116.387771')">人民大会堂</a></div>
+                                    <div><i class="fas fa-camera mr-1"></i> 最佳拍摄角度在广场东侧</div>
+                                </div>
+                            </div>
+                        </div>
+                        
+                        <div class="timeline-item">
+                            <div class="bg-gray-50 p-4 rounded-lg">
+                                <div class="flex justify-between items-start mb-2">
+                                    <h4 class="font-semibold text-lg">10:30 - 故宫博物院深度游览</h4>
+                                    <span class="text-sm text-gray-500 bg-yellow-100 px-2 py-1 rounded">重点景点</span>
+                                </div>
+                                <p class="text-gray-600 mb-2">中轴线游览：午门-太和殿-乾清宫-御花园</p>
+                                <div class="text-sm text-gray-500 space-y-1">
+                                    <div><i class="fas fa-map-marker-alt mr-1"></i>
+                                    <a href="#" class="location-link" onclick="openNavigation('故宫博物院', '39.915119,116.396401')">故宫博物院</a></div>
+                                    <div><i class="fas fa-ticket-alt mr-1"></i> 门票：60元/人 (需网上预约)</div>
+                                    <div><i class="fas fa-clock mr-1"></i> 预计游览时间：4小时</div>
+                                    <div><i class="fas fa-route mr-1"></i> 推荐路线：午门→太和殿→中和殿→保和殿→乾清宫→坤宁宫→御花园→神武门</div>
+                                </div>
+                            </div>
+                        </div>
+                        
+                        <div class="timeline-item">
+                            <div class="bg-gray-50 p-4 rounded-lg">
+                                <div class="flex justify-between items-start mb-2">
+                                    <h4 class="font-semibold text-lg">15:00 - 景山公园登高远眺</h4>
+                                    <span class="text-sm text-gray-500 bg-green-100 px-2 py-1 rounded">观景摄影</span>
+                                </div>
+                                <p class="text-gray-600 mb-2">登上万春亭，俯瞰故宫全景</p>
+                                <div class="text-sm text-gray-500 space-y-1">
+                                    <div><i class="fas fa-map-marker-alt mr-1"></i>
+                                    <a href="#" class="location-link" onclick="openNavigation('景山公园', '39.922362,116.395103')">景山公园</a></div>
+                                    <div><i class="fas fa-ticket-alt mr-1"></i> 门票：2元/人</div>
+                                    <div><i class="fas fa-camera mr-1"></i> 拍摄故宫全景的最佳位置</div>
+                                </div>
+                            </div>
+                        </div>
+                        
+                        <div class="timeline-item">
+                            <div class="bg-gray-50 p-4 rounded-lg">
+                                <div class="flex justify-between items-start mb-2">
+                                    <h4 class="font-semibold text-lg">18:30 - 什刹海酒吧街夜游</h4>
+                                    <span class="text-sm text-gray-500 bg-purple-100 px-2 py-1 rounded">夜生活</span>
+                                </div>
+                                <p class="text-gray-600 mb-2">胡同游览，酒吧一条街，体验北京夜生活</p>
+                                <div class="text-sm text-gray-500 space-y-1">
+                                    <div><i class="fas fa-map-marker-alt mr-1"></i>
+                                    <a href="#" class="location-link" onclick="openNavigation('什刹海酒吧街', '39.939663,116.391627')">什刹海酒吧街</a></div>
+                                    <div><i class="fas fa-glass-cheers mr-1"></i> 推荐：胡同里酒吧、荷花市场</div>
+                                </div>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+            </div>
+
+            <!-- 第三天 6.19 -->
+            <div class="card day-card">
+                <div class="p-6">
+                    <div class="flex items-center mb-6">
+                        <div class="bg-green-500 text-white rounded-full w-12 h-12 flex items-center justify-center mr-4">
+                            <span class="font-bold">D3</span>
+                        </div>
+                        <div>
+                            <h3 class="text-2xl font-bold text-gray-800">6月19日 (周三) - 皇家园林与学府之旅</h3>
+                            <p class="text-gray-600">颐和园游湖赏景，清华大学感受学术氛围</p>
+                        </div>
+                    </div>
+                    
+                    <div class="timeline">
+                        <div class="timeline-item">
+                            <div class="bg-gray-50 p-4 rounded-lg">
+                                <div class="flex justify-between items-start mb-2">
+                                    <h4 class="font-semibold text-lg">08:00 - 颐和园深度游览</h4>
+                                    <span class="text-sm text-gray-500 bg-green-100 px-2 py-1 rounded">皇家园林</span>
+                                </div>
+                                <p class="text-gray-600 mb-2">游览万寿山、昆明湖，体验皇家园林精髓</p>
+                                <div class="text-sm text-gray-500 space-y-1">
+                                    <div><i class="fas fa-map-marker-alt mr-1"></i>
+                                    <a href="#" class="location-link" onclick="openNavigation('颐和园', '39.999748,116.275205')">颐和园</a></div>
+                                    <div><i class="fas fa-ticket-alt mr-1"></i> 门票：30元/人（联票60元/人）</div>
+                                    <div><i class="fas fa-clock mr-1"></i> 预计游览时间：4-5小时</div>
+                                    <div><i class="fas fa-route mr-1"></i> 推荐路线：东宫门→仁寿殿→德和园→万寿山→佛香阁→长廊→昆明湖→十七孔桥</div>
+                                </div>
+                            </div>
+                        </div>
+                        
+                        <div class="timeline-item">
+                            <div class="bg-gray-50 p-4 rounded-lg">
+                                <div class="flex justify-between items-start mb-2">
+                                    <h4 class="font-semibold text-lg">14:00 - 清华大学参观</h4>
+                                    <span class="text-sm text-gray-500 bg-purple-100 px-2 py-1 rounded">学府体验</span>
+                                </div>
+                                <p class="text-gray-600 mb-2">参观清华园，感受百年学府的学术氛围</p>
+                                <div class="text-sm text-gray-500 space-y-1">
+                                    <div><i class="fas fa-map-marker-alt mr-1"></i>
+                                    <a href="#" class="location-link" onclick="openNavigation('清华大学', '40.000942,116.326930')">清华大学</a></div>
+                                    <div><i class="fas fa-id-card mr-1"></i> 需身份证登记进入</div>
+                                    <div><i class="fas fa-graduation-cap mr-1"></i> 重点参观：清华园门、大礼堂、图书馆、荷塘月色</div>
+                                    <div><i class="fas fa-clock mr-1"></i> 参观时间：2-3小时</div>
+                                </div>
+                            </div>
+                        </div>
+                        
+                        <div class="timeline-item">
+                            <div class="bg-gray-50 p-4 rounded-lg">
+                                <div class="flex justify-between items-start mb-2">
+                                    <h4 class="font-semibold text-lg">17:30 - 五道口用餐购物</h4>
+                                    <span class="text-sm text-gray-500 bg-blue-100 px-2 py-1 rounded">休闲娱乐</span>
+                                </div>
+                                <p class="text-gray-600 mb-2">体验"宇宙中心"五道口的繁华</p>
+                                <div class="text-sm text-gray-500 space-y-1">
+                                    <div><i class="fas fa-map-marker-alt mr-1"></i>
+                                    <a href="#" class="location-link" onclick="openNavigation('五道口购物中心', '40.006577,116.333177')">五道口购物中心</a></div>
+                                    <div><i class="fas fa-utensils mr-1"></i> 推荐：海底捞、西贝莜面村</div>
+                                    <div><i class="fas fa-shopping-bag mr-1"></i> 华联商厦、城铁购物中心</div>
+                                </div>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+            </div>
+
+            <!-- 第四天 6.20 -->
+            <div class="card day-card">
+                <div class="p-6">
+                    <div class="flex items-center mb-6">
+                        <div class="bg-purple-500 text-white rounded-full w-12 h-12 flex items-center justify-center mr-4">
+                            <span class="font-bold">D4</span>
+                        </div>
+                        <div>
+                            <h3 class="text-2xl font-bold text-gray-800">6月20日 (周四) - 毕业庆典与长城之旅</h3>
+                            <p class="text-gray-600">见证毕业时刻，征服万里长城</p>
+                        </div>
+                    </div>
+                    
+                    <div class="timeline">
+                        <div class="timeline-item">
+                            <div class="bg-gray-50 p-4 rounded-lg">
+                                <div class="flex justify-between items-start mb-2">
+                                    <h4 class="font-semibold text-lg">09:00 - 北京交通大学毕业典礼</h4>
+                                    <span class="text-sm text-gray-500 bg-purple-100 px-2 py-1 rounded">重要活动</span>
+                                </div>
+                                <p class="text-gray-600 mb-2">参加毕业典礼，见证人生重要时刻</p>
+                                <div class="text-sm text-gray-500 space-y-1">
+                                    <div><i class="fas fa-map-marker-alt mr-1"></i>
+                                    <a href="#" class="location-link" onclick="openNavigation('北京交通大学', '39.958856,116.355103')">北京交通大学</a></div>
+                                    <div><i class="fas fa-graduation-cap mr-1"></i> 建议提前30分钟到达</div>
+                                    <div><i class="fas fa-camera mr-1"></i> 准备拍照留念</div>
+                                </div>
+                            </div>
+                        </div>
+                        
+                        <div class="timeline-item">
+                            <div class="bg-gray-50 p-4 rounded-lg">
+                                <div class="flex justify-between items-start mb-2">
+                                    <h4 class="font-semibold text-lg">13:00 - 前往八达岭长城</h4>
+                                    <span class="text-sm text-gray-500 bg-yellow-100 px-2 py-1 rounded">世界遗产</span>
+                                </div>
+                                <p class="text-gray-600 mb-2">登临万里长城，体验"不到长城非好汉"的豪情</p>
+                                <div class="text-sm text-gray-500 space-y-1">
+                                    <div><i class="fas fa-map-marker-alt mr-1"></i>
+                                    <a href="#" class="location-link" onclick="openNavigation('八达岭长城', '40.359592,116.020089')">八达岭长城</a></div>
+                                    <div><i class="fas fa-ticket-alt mr-1"></i> 门票：45元/人（旺季）</div>
+                                    <div><i class="fas fa-bus mr-1"></i> 交通：德胜门乘877路直达（2小时）</div>
+                                    <div><i class="fas fa-mountain mr-1"></i> 推荐爬到第8烽火台（最经典段落）</div>
+                                    <div class="bg-yellow-50 p-2 rounded mt-2">
+                                        <i class="fas fa-exclamation-circle mr-1 text-yellow-500"></i>
+                                        <strong>小贴士：</strong>建议穿运动鞋，携带水和零食，防晒用品必备
+                                    </div>
+                                </div>
+                            </div>
+                        </div>
+                        
+                        <div class="timeline-item">
+                            <div class="bg-gray-50 p-4 rounded-lg">
+                                <div class="flex justify-between items-start mb-2">
+                                    <h4 class="font-semibold text-lg">18:00 - 返回市区，簋街夜宵</h4>
+                                    <span class="text-sm text-gray-500 bg-red-100 px-2 py-1 rounded">美食街</span>
+                                </div>
+                                <p class="text-gray-600 mb-2">品尝北京夜宵文化，麻辣小龙虾配啤酒</p>
+                                <div class="text-sm text-gray-500 space-y-1">
+                                    <div><i class="fas fa-map-marker-alt mr-1"></i>
+                                    <a href="#" class="location-link" onclick="openNavigation('簋街', '39.946208,116.421649')">簋街（东直门内大街）</a></div>
+                                    <div><i class="fas fa-utensils mr-1"></i> 推荐：胡大饭馆、麻辣诱惑</div>
+                                    <div><i class="fas fa-subway mr-1"></i> 地铁5号线北新桥站</div>
+                                </div>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+            </div>
+
+            <!-- 第五天 6.21 -->
+            <div class="card day-card">
+                <div class="p-6">
+                    <div class="flex items-center mb-6">
+                        <div class="bg-yellow-500 text-white rounded-full w-12 h-12 flex items-center justify-center mr-4">
+                            <span class="font-bold">D5</span>
+                        </div>
+                        <div>
+                            <h3 class="text-2xl font-bold text-gray-800">6月21日 (周五) - 文化艺术收官之旅</h3>
+                            <p class="text-gray-600">探索798艺术区，王府井购物，完美收官</p>
+                        </div>
+                    </div>
+                    
+                    <div class="timeline">
+                        <div class="timeline-item">
+                            <div class="bg-gray-50 p-4 rounded-lg">
+                                <div class="flex justify-between items-start mb-2">
+                                    <h4 class="font-semibold text-lg">09:00 - 798艺术区文艺之旅</h4>
+                                    <span class="text-sm text-gray-500 bg-pink-100 px-2 py-1 rounded">艺术文化</span>
+                                </div>
+                                <p class="text-gray-600 mb-2">探索当代艺术圣地，感受工业遗址的艺术重生</p>
+                                <div class="text-sm text-gray-500 space-y-1">
+                                    <div><i class="fas fa-map-marker-alt mr-1"></i>
+                                    <a href="#" class="location-link" onclick="openNavigation('798艺术区', '39.989522,116.495671')">798艺术区</a></div>
+                                    <div><i class="fas fa-palette mr-1"></i> 重点参观：尤伦斯当代艺术中心、佩斯画廊</div>
+                                    <div><i class="fas fa-camera mr-1"></i> 工业风建筑拍照打卡圣地</div>
+                                    <div><i class="fas fa-coffee mr-1"></i> 推荐：798里的文艺咖啡厅</div>
+                                    <div><i class="fas fa-clock mr-1"></i> 游览时间：3小时</div>
+                                </div>
+                            </div>
+                        </div>
+                        
+                        <div class="timeline-item">
+                            <div class="bg-gray-50 p-4 rounded-lg">
+                                <div class="flex justify-between items-start mb-2">
+                                    <h4 class="font-semibold text-lg">13:00 - 王府井步行街购物</h4>
+                                    <span class="text-sm text-gray-500 bg-blue-100 px-2 py-1 rounded">购物娱乐</span>
+                                </div>
+                                <p class="text-gray-600 mb-2">北京最著名的商业街，购买纪念品和特产</p>
+                                <div class="text-sm text-gray-500 space-y-1">
+                                    <div><i class="fas fa-map-marker-alt mr-1"></i>
+                                    <a href="#" class="location-link" onclick="openNavigation('王府井步行街', '39.913419,116.410226')">王府井步行街</a></div>
+                                    <div><i class="fas fa-shopping-bag mr-1"></i> 推荐：王府井百货、APM、新东安市场</div>
+                                    <div><i class="fas fa-gift mr-1"></i> 特产：稻香村糕点、同仁堂中药</div>
+                                    <div><i class="fas fa-utensils mr-1"></i> 小吃：王府井小吃街</div>
+                                </div>
+                            </div>
+                        </div>
+                        
+                        <div class="timeline-item">
+                            <div class="bg-gray-50 p-4 rounded-lg">
+                                <div class="flex justify-between items-start mb-2">
+                                    <h4 class="font-semibold text-lg">16:00 - 国家博物馆（可选）</h4>
+                                    <span class="text-sm text-gray-500 bg-green-100 px-2 py-1 rounded">文化补充</span>
+                                </div>
+                                <p class="text-gray-600 mb-2">时间充裕可参观，了解中华五千年文明史</p>
+                                <div class="text-sm text-gray-500 space-y-1">
+                                    <div><i class="fas fa-map-marker-alt mr-1"></i>
+                                    <a href="#" class="location-link" onclick="openNavigation('中国国家博物馆', '39.902982,116.395364')">中国国家博物馆</a></div>
+                                    <div><i class="fas fa-ticket-alt mr-1"></i> 免费参观，需提前预约</div>
+                                    <div><i class="fas fa-clock mr-1"></i> 开放时间：9:00-17:00（周一闭馆）</div>
+                                </div>
+                            </div>
+                        </div>
+                        
+                        <div class="timeline-item">
+                            <div class="bg-gray-50 p-4 rounded-lg">
+                                <div class="flex justify-between items-start mb-2">
+                                    <h4 class="font-semibold text-lg">18:30 - 北京烤鸭告别宴</h4>
+                                    <span class="text-sm text-gray-500 bg-red-100 px-2 py-1 rounded">告别晚餐</span>
+                                </div>
+                                <p class="text-gray-600 mb-2">便宜坊或大董烤鸭，为北京之旅画下完美句号</p>
+                                <div class="text-sm text-gray-500 space-y-1">
+                                    <div><i class="fas fa-map-marker-alt mr-1"></i>
+                                    <a href="#" class="location-link" onclick="openNavigation('便宜坊烤鸭店', '39.912476,116.408764')">便宜坊烤鸭店</a></div>
+                                    <div><i class="fas fa-money-bill-wave mr-1"></i> 预算：200-300元/人</div>
+                                    <div><i class="fas fa-heart mr-1 text-red-500"></i> 为美好的北京之旅干杯！</div>
+                                </div>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+            </div>
+        </div>
+
+        <!-- 景点地图 -->
+        <div class="card p-8 mb-8">
+            <h2 class="text-3xl font-bold mb-6 text-center" style="color: var(--text-dark);">
+                <i class="fas fa-map mr-3 text-green-500"></i>
+                景点地图导览
+            </h2>
+            <div id="map" class="map-container"></div>
+            <p class="text-center text-gray-600 mt-4">
+                <i class="fas fa-info-circle mr-2"></i>
+                点击地图上的标记可查看详细信息，点击景点名称可调用导航
+            </p>
+        </div>
+
+        <!-- 交通信息 -->
+        <div class="card p-8 mb-8">
+            <h2 class="text-3xl font-bold mb-6" style="color: var(--text-dark);">
+                <i class="fas fa-train mr-3 text-blue-500"></i>
+                交通出行指南
+            </h2>
+            <div class="grid grid-cols-1 md:grid-cols-2 gap-6">
+                <div class="bg-blue-50 p-6 rounded-lg">
+                    <h3 class="text-xl font-semibold mb-4 text-blue-800">
+                        <i class="fas fa-subway mr-2"></i>地铁出行
+                    </h3>
+                    <div class="space-y-3 text-sm">
+                        <div class="flex items-center">
+                            <span class="bg-red-500 text-white px-2 py-1 rounded mr-3 font-bold">1号线</span>
+                            <span>天安门东/西站 - 直达天安门广场</span>
+                        </div>
+                        <div class="flex items-center">
+                            <span class="bg-blue-500 text-white px-2 py-1 rounded mr-3 font-bold">2号线</span>
+                            <span>前门站 - 前门大街、国家博物馆</span>
+                        </div>
+                        <div class="flex items-center">
+                            <span class="bg-green-500 text-white px-2 py-1 rounded mr-3 font-bold">4号线</span>
+                            <span>颐和园站 - 直达颐和园西门</span>
+                        </div>
+                        <div class="flex items-center">
+                            <span class="bg-purple-500 text-white px-2 py-1 rounded mr-3 font-bold">13号线</span>
+                            <span>五道口站 - 清华大学、五道口</span>
+                        </div>
+                    </div>
+                </div>
+                
+                <div class="bg-yellow-50 p-6 rounded-lg">
+                    <h3 class="text-xl font-semibold mb-4 text-yellow-800">
+                        <i class="fas fa-bus mr-2"></i>公交专线
+                    </h3>
+                    <div class="space-y-3 text-sm">
+                        <div><strong>877路：</strong>德胜门 → 八达岭长城（直达专线）</div>
+                        <div><strong>旅游专线：</strong>前门 → 八达岭长城（导游服务）</div>
+                        <div><strong>观光巴士：</strong>天安门 → 颐和园（沿途观光）</div>
+                        <div><strong>夜班车：</strong>主要景点均有夜班车服务至23:00</div>
+                    </div>
+                </div>
+            </div>
+            
+            <div class="bg-gray-50 p-6 rounded-lg mt-6">
+                <h3 class="text-xl font-semibold mb-4">
+                    <i class="fas fa-route mr-2 text-indigo-600"></i>从北京交通大学出发的建议路线
+                </h3>
+                <div class="grid grid-cols-1 md:grid-cols-2 gap-4 text-sm">
+                    <div>
+                        <strong class="text-blue-600">到天安门：</strong><br>
+                        地铁2号线西直门站 → 转1号线 → 天安门东站（约40分钟）
+                    </div>
+                    <div>
+                        <strong class="text-green-600">到颐和园：</strong><br>
+                        地铁2号线西直门站 → 转4号线 → 颐和园站（约30分钟）
+                    </div>
+                    <div>
+                        <strong class="text-purple-600">到清华大学：</strong><br>
+                        地铁2号线西直门站 → 转13号线 → 五道口站（约25分钟）
+                    </div>
+                    <div>
+                        <strong class="text-red-600">到八达岭长城：</strong><br>
+                        地铁2号线积水潭站 → 步行至德胜门 → 877路（约2.5小时）
+                    </div>
+                </div>
+            </div>
+        </div>
+
+        <!-- 实用信息 -->
+        <div class="grid grid-cols-1 md:grid-cols-2 gap-8 mb-8">
+            <!-- 预算信息 -->
+            <div class="card p-6">
+                <h3 class="text-2xl font-bold mb-4" style="color: var(--text-dark);">
+                    <i class="fas fa-calculator mr-3 text-green-500"></i>
+                    预算参考
+                </h3>
+                <div class="space-y-4">
+                    <div class="flex justify-between items-center py-2 border-b border-gray-100">
+                        <span class="font-medium">门票费用</span>
+                        <span class="text-green-600 font-bold">约200元/人</span>
+                    </div>
+                    <div class="flex justify-between items-center py-2 border-b border-gray-100">
+                        <span class="font-medium">餐饮费用</span>
+                        <span class="text-yellow-600 font-bold">约800元/人</span>
+                    </div>
+                    <div class="flex justify-between items-center py-2 border-b border-gray-100">
+                        <span class="font-medium">交通费用</span>
+                        <span class="text-blue-600 font-bold">约150元/人</span>
+                    </div>
+                    <div class="flex justify-between items-center py-2 border-b border-gray-100">
+                        <span class="font-medium">购物娱乐</span>
+                        <span class="text-purple-600 font-bold">约500元/人</span>
+                    </div>
+                    <div class="flex justify-between items-center py-2 bg-gray-50 rounded-lg px-3">
+                        <span class="font-bold text-lg">总计预算</span>
+                        <span class="text-red-600 font-bold text-xl">约1650元/人</span>
+                    </div>
+                </div>
+            </div>
+
+            <!-- 实用贴士 -->
+            <div class="card p-6">
+                <h3 class="text-2xl font-bold mb-4" style="color: var(--text-dark);">
+                    <i class="fas fa-lightbulb mr-3 text-yellow-500"></i>
+                    实用贴士
+                </h3>
+                <div class="space-y-3 text-sm">
+                    <div class="flex items-start">
+                        <i class="fas fa-mobile-alt mr-3 text-blue-500 mt-1"></i>
+                        <div>
+                            <strong>必备APP：</strong><br>
+                            高德地图、京通、北京地铁、大众点评
+                        </div>
+                    </div>
+                    <div class="flex items-start">
+                        <i class="fas fa-id-card mr-3 text-green-500 mt-1"></i>
+                        <div>
+                            <strong>证件准备：</strong><br>
+                            身份证必带，学生证可享受门票优惠
+                        </div>
+                    </div>
+                    <div class="flex items-start">
+                        <i class="fas fa-cloud-sun mr-3 text-yellow-500 mt-1"></i>
+                        <div>
+                            <strong>天气准备：</strong><br>
+                            6月北京多雨，准备雨具，防晒霜必备
+                        </div>
+                    </div>
+                    <div class="flex items-start">
+                        <i class="fas fa-exclamation-triangle mr-3 text-red-500 mt-1"></i>
+                        <div>
+                            <strong>预约提醒：</strong><br>
+                            故宫、国博需提前网上预约，升旗仪式需早起
+                        </div>
+                    </div>
+                </div>
+            </div>
+        </div>
+
+        <!-- 紧急联系信息 -->
+        <div class="card p-6 mb-8 bg-red-50 border-l-4 border-red-500">
+            <h3 class="text-xl font-bold mb-4 text-red-800">
+                <i class="fas fa-phone-alt mr-3"></i>
+                紧急联系信息
+            </h3>
+            <div class="grid grid-cols-1 md:grid-cols-3 gap-4 text-sm">
+                <div>
+                    <strong>紧急救援：</strong><br>
+                    <span class="text-red-600 font-bold">110 / 119 / 120</span>
+                </div>
+                <div>
+                    <strong>旅游投诉：</strong><br>
+                    <span class="text-blue-600 font-bold">010-65130828</span>
+                </div>
+                <div>
+                    <strong>交通服务：</strong><br>
+                    <span class="text-green-600 font-bold">96166</span>
+                </div>
+            </div>
+        </div>
+
+        <!-- 页脚 -->
+        <div class="text-center py-8 text-gray-500">
+            <div class="flex justify-center items-center space-x-4 mb-4">
+                <i class="fas fa-heart text-red-500"></i>
+                <span>愿您在北京度过难忘的美好时光</span>
+                <i class="fas fa-heart text-red-500"></i>
+            </div>
+            <p class="text-sm">此行程仅供参考，请根据实际情况调整安排</p>
+        </div>
+    </div>
+
+    <!-- JavaScript -->
+    <script src="https://unpkg.com/leaflet@1.9.4/dist/leaflet.js" integrity="sha256-20nQCchB9co0qIjJZRGuk2/Z9VM+kNiyxNV1lvTlZBo=" crossorigin=""></script>
+    
+    <script>
+        // 地图初始化
+        var map = L.map('map').setView([39.913819, 116.403119], 11);
+        
+        L.tileLayer('https://{s}.tile.openstreetmap.org/{z}/{x}/{y}.png', {
+            attribution: '© OpenStreetMap contributors'
+        }).addTo(map);
+
+        // 景点标记
+        var attractions = [
+            {name: "北京交通大学", lat: 39.958856, lng: 116.355103, color: "blue"},
+            {name: "天安门广场", lat: 39.903847, lng: 116.391548, color: "red"},
+            {name: "故宫博物院", lat: 39.915119, lng: 116.396401, color: "red"},
+            {name: "景山公园", lat: 39.922362, lng: 116.395103, color: "green"},
+            {name: "颐和园", lat: 39.999748, lng: 116.275205, color: "green"},
+            {name: "清华大学", lat: 40.000942, lng: 116.326930, color: "purple"},
+            {name: "八达岭长城", lat: 40.359592, lng: 116.020089, color: "orange"},
+            {name: "798艺术区", lat: 39.989522, lng: 116.495671, color: "pink"},
+            {name: "王府井步行街", lat: 39.913419, lng: 116.410226, color: "blue"}
+        ];
+
+        attractions.forEach(function(attraction) {
+            var marker = L.marker([attraction.lat, attraction.lng]).addTo(map);
+            marker.bindPopup(`
+                <div class="text-center">
+                    <h4 class="font-bold text-lg mb-2">${attraction.name}</h4>
+                    <button onclick="openNavigation('${attraction.name}', '${attraction.lat},${attraction.lng}')" 
+                            class="bg-blue-500 text-white px-4 py-2 rounded hover:bg-blue-600 transition">
+                        <i class="fas fa-navigation mr-2"></i>导航
+                    </button>
+                </div>
+            `);
+            
+            // 永久显示标签
+            var label = L.divIcon({
+                className: 'location-label',
+                html: `<div style="background: ${attraction.color}; color: white; padding: 2px 6px; border-radius: 12px; font-size: 11px; font-weight: bold; box-shadow: 0 2px 4px rgba(0,0,0,0.3); white-space: nowrap;">${attraction.name}</div>`,
+                iconSize: [100, 20],
+                iconAnchor: [50, 10]
+            });
+            L.marker([attraction.lat, attraction.lng], {icon: label}).addTo(map);
+        });
+
+        // 导航功能
+        function openNavigation(name, coordinates) {
+            var userAgent = navigator.userAgent;
+            var coords = coordinates.split(',');
+            var lat = coords[0];
+            var lng = coords[1];
+            
+            if (/iPhone|iPad|iPod/.test(userAgent)) {
+                // iOS设备 - 高德地图
+                window.location.href = `iosamap://path?sourceApplication=webapp&dname=${encodeURIComponent(name)}&dlat=${lat}&dlon=${lng}&dev=0&t=0`;
+            } else if (/Android/.test(userAgent)) {
+                // Android设备 - 高德地图
+                window.location.href = `androidamap://route?sourceApplication=webapp&dname=${encodeURIComponent(name)}&dlat=${lat}&dlon=${lng}&dev=0&t=0`;
+            } else {
+                // PC端 - 高德地图网页版
+                window.open(`https://uri.amap.com/marker?position=${lng},${lat}&name=${encodeURIComponent(name)}&src=webapp`, '_blank');
+            }
+        }
+
+        // 平滑滚动
+        document.querySelectorAll('a[href^="#"]').forEach(anchor => {
+            anchor.addEventListener('click', function (e) {
+                e.preventDefault();
+                document.querySelector(this.getAttribute('href')).scrollIntoView({
+                    behavior: 'smooth'
+                });
+            });
+        });
+
+        // 卡片悬浮效果增强
+        document.querySelectorAll('.card').forEach(card => {
+            card.addEventListener('mouseenter', function() {
+                this.style.transform = 'translateY(-8px)';
+                this.style.boxShadow = '0 25px 50px -12px rgba(0, 0, 0, 0.25)';
+            });
+            
+            card.addEventListener('mouseleave', function() {
+                this.style.transform = 'translateY(0)';
+                this.style.boxShadow = '0 10px 15px -3px rgba(0, 0, 0, 0.1)';
+            });
+        });
+    </script>
+</body>
+</html> 
