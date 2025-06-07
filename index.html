@@ -1,0 +1,488 @@
+<!DOCTYPE html>
+<html lang="zh-CN">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>北京首都5日游 | 2025年6月17-21日</title>
+    <link rel="stylesheet" href="https://lf3-cdn-tos.bytecdntp.com/cdn/expire-1-M/tailwindcss/2.2.19/tailwind.min.css">
+    <link rel="stylesheet" href="https://lf6-cdn-tos.bytecdntp.com/cdn/expire-100-M/font-awesome/6.0.0/css/all.min.css">
+    <link rel="stylesheet" href="https://fonts.googleapis.com/css2?family=Noto+Serif+SC:wght@400;500;600;700&family=Noto+Sans+SC:wght@300;400;500;700&display=swap">
+    <link rel="stylesheet" href="https://unpkg.com/leaflet@1.9.4/dist/leaflet.css" integrity="sha256-p4NxAoJBhIIN+hmNHrzRCf9tD/miZyoHS5obTRR9BMY=" crossorigin=""/>
+    
+    <style>
+        :root {
+            --primary: #FF6B6B;
+            --secondary: #4ECDC4;
+            --accent: #FFE66D;
+            --dark: #2D3748;
+            --light: #F7FAFC;
+            --gradient: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
+        }
+        
+        body {
+            font-family: 'Noto Sans SC', sans-serif;
+            background: linear-gradient(135deg, #ff9a9e 0%, #fecfef 50%, #fecfef 100%);
+            min-height: 100vh;
+        }
+        
+        .hero-bg {
+            background: linear-gradient(135deg, rgba(255,107,107,0.9), rgba(78,205,196,0.9)), url('data:image/svg+xml,<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 1000 300"><defs><linearGradient id="bg" x1="0%" y1="0%" x2="100%" y2="100%"><stop offset="0%" style="stop-color:%23ff9a9e"/><stop offset="100%" style="stop-color:%23fecfef"/></linearGradient></defs><rect fill="url(%23bg)" width="1000" height="300"/></svg>');
+        }
+        
+        .card {
+            backdrop-filter: blur(20px);
+            border: 1px solid rgba(255,255,255,0.2);
+            box-shadow: 0 25px 50px -12px rgba(0,0,0,0.25);
+        }
+        
+        .nav-location {
+            cursor: pointer;
+            transition: all 0.3s ease;
+        }
+        
+        .nav-location:hover {
+            color: var(--primary);
+            transform: scale(1.05);
+        }
+        
+        .timeline-item {
+            position: relative;
+            padding-left: 2rem;
+        }
+        
+        .timeline-item::before {
+            content: '';
+            position: absolute;
+            left: 0;
+            top: 0.5rem;
+            width: 12px;
+            height: 12px;
+            background: var(--primary);
+            border-radius: 50%;
+            border: 3px solid white;
+            box-shadow: 0 0 0 3px var(--primary);
+        }
+        
+        .weather-card {
+            background: linear-gradient(45deg, #74b9ff, #0984e3);
+        }
+        
+        .map-container {
+            height: 300px;
+            border-radius: 1rem;
+            overflow: hidden;
+        }
+    </style>
+</head>
+<body>
+    <!-- Hero Section -->
+    <header class="hero-bg text-white py-16">
+        <div class="container mx-auto px-4">
+            <div class="text-center">
+                <h1 class="text-5xl font-bold mb-4">
+                    <i class="fas fa-crown text-yellow-300 mr-3"></i>
+                    北京首都5日游
+                </h1>
+                <p class="text-2xl mb-6">探索千年古都的魅力之旅</p>
+                <div class="flex justify-center items-center space-x-8 text-lg">
+                    <div><i class="fas fa-calendar-alt mr-2"></i>2025年6月17日-21日</div>
+                    <div><i class="fas fa-users mr-2"></i>3人家庭团</div>
+                    <div><i class="fas fa-map-marker-alt mr-2"></i>北京交通大学出发</div>
+                </div>
+            </div>
+        </div>
+    </header>
+
+    <div class="container mx-auto px-4 py-8 space-y-8">
+        
+        <!-- 天气信息卡片 -->
+        <div class="card weather-card rounded-2xl p-6 text-white">
+            <h2 class="text-2xl font-bold mb-4"><i class="fas fa-cloud-sun mr-3"></i>天气预报</h2>
+            <div class="grid grid-cols-1 md:grid-cols-4 gap-4">
+                <div class="text-center">
+                    <div class="font-semibold">6月18日</div>
+                    <i class="fas fa-sun text-3xl my-2"></i>
+                    <div>晴天 22°-33°C</div>
+                </div>
+                <div class="text-center">
+                    <div class="font-semibold">6月19日</div>
+                    <i class="fas fa-cloud-sun text-3xl my-2"></i>
+                    <div>多云 23°-34°C</div>
+                </div>
+                <div class="text-center">
+                    <div class="font-semibold">6月20日</div>
+                    <i class="fas fa-sun text-3xl my-2"></i>
+                    <div>晴天 22°-33°C</div>
+                </div>
+                <div class="text-center">
+                    <div class="font-semibold">6月21日</div>
+                    <i class="fas fa-cloud-rain text-3xl my-2"></i>
+                    <div>雷阵雨 22°-34°C</div>
+                </div>
+            </div>
+        </div>
+
+        <!-- 重要提醒卡片 -->
+        <div class="card bg-red-50 rounded-2xl p-6 border-l-4 border-red-500">
+            <h2 class="text-2xl font-bold text-red-800 mb-4">
+                <i class="fas fa-exclamation-triangle mr-3"></i>独立出行指导
+            </h2>
+            <div class="bg-white rounded-xl p-4 shadow-sm">
+                <h3 class="font-bold text-lg text-red-700 mb-3">6月16日：江南客运站到南宁站交通指导</h3>
+                <div class="space-y-3 text-gray-700">
+                    <div class="flex items-start">
+                        <span class="bg-red-500 text-white rounded-full w-6 h-6 flex items-center justify-center text-sm mr-3 mt-0.5">1</span>
+                        <div>
+                            <div class="font-semibold">江南客运站→江南客运站地铁站B口</div>
+                            <div class="text-sm">步行300米（约4分钟）</div>
+                        </div>
+                    </div>
+                    <div class="flex items-start">
+                        <span class="bg-red-500 text-white rounded-full w-6 h-6 flex items-center justify-center text-sm mr-3 mt-0.5">2</span>
+                        <div>
+                            <div class="font-semibold">乘坐地铁2号线</div>
+                            <div class="text-sm">上车方向：西津方向，坐6站到火车站下车</div>
+                        </div>
+                    </div>
+                    <div class="flex items-start">
+                        <span class="bg-red-500 text-white rounded-full w-6 h-6 flex items-center justify-center text-sm mr-3 mt-0.5">4</span>
+                        <div>
+                            <div class="font-semibold">到达南宁站</div>
+                            <div class="text-sm">出地铁后步行224米即到南宁站，全程约23分钟</div>
+                        </div>
+                    </div>
+                </div>
+            </div>
+        </div>
+
+        <!-- 详细行程卡片 -->
+        <div class="grid grid-cols-1 lg:grid-cols-3 gap-6">
+            
+            <!-- 6月17日 -->
+            <div class="card bg-white rounded-2xl p-6">
+                <div class="bg-gradient-to-r from-purple-500 to-pink-500 text-white rounded-xl p-4 mb-4">
+                    <h3 class="text-xl font-bold">6月17日 周二</h3>
+                    <p class="opacity-90">抵达北京・初探古都</p>
+                </div>
+                <div class="space-y-4">
+                    <div class="timeline-item">
+                        <div class="font-semibold text-purple-600">18:00</div>
+                        <div class="text-gray-700">在北京西站会合</div>
+                    </div>
+                    <div class="timeline-item">
+                        <div class="font-semibold text-purple-600">19:00</div>
+                        <div class="text-gray-700 nav-location" onclick="openNavigation('前门大街')">
+                            <i class="fas fa-utensils mr-2"></i>前门大街晚餐
+                            <i class="fas fa-external-link-alt ml-2 text-sm"></i>
+                        </div>
+                    </div>
+                    <div class="timeline-item">
+                        <div class="font-semibold text-purple-600">20:00</div>
+                        <div class="text-gray-700">品尝北京烤鸭，感受老北京文化</div>
+                    </div>
+                </div>
+            </div>
+
+            <!-- 6月18日 -->
+            <div class="card bg-white rounded-2xl p-6">
+                <div class="bg-gradient-to-r from-red-500 to-orange-500 text-white rounded-xl p-4 mb-4">
+                    <h3 class="text-xl font-bold">6月18日 周三</h3>
+                    <p class="opacity-90">天安门・故宫・景山</p>
+                </div>
+                <div class="space-y-4">
+                    <div class="timeline-item">
+                        <div class="font-semibold text-red-600">8:00</div>
+                        <div class="text-gray-700">北京交通大学出发</div>
+                        <div class="text-sm text-gray-500 mt-1">651路→地铁2号线→地铁1号线 (约1小时10分钟)</div>
+                    </div>
+                    <div class="timeline-item">
+                        <div class="font-semibold text-red-600">9:30</div>
+                        <div class="text-gray-700 nav-location" onclick="openNavigation('天安门广场')">
+                            <i class="fas fa-landmark mr-2"></i>天安门广场
+                            <i class="fas fa-external-link-alt ml-2 text-sm"></i>
+                        </div>
+                    </div>
+                    <div class="timeline-item">
+                        <div class="font-semibold text-red-600">10:30</div>
+                        <div class="text-gray-700 nav-location" onclick="openNavigation('毛主席纪念堂')">
+                            <i class="fas fa-monument mr-2"></i>毛主席纪念堂
+                            <i class="fas fa-external-link-alt ml-2 text-sm"></i>
+                        </div>
+                    </div>
+                    <div class="timeline-item">
+                        <div class="font-semibold text-red-600">14:00</div>
+                        <div class="text-gray-700 nav-location" onclick="openNavigation('故宫博物院')">
+                            <i class="fas fa-crown mr-2"></i>故宫博物院 (3-4小时)
+                            <i class="fas fa-external-link-alt ml-2 text-sm"></i>
+                        </div>
+                    </div>
+                    <div class="timeline-item">
+                        <div class="font-semibold text-red-600">18:00</div>
+                        <div class="text-gray-700 nav-location" onclick="openNavigation('景山公园')">
+                            <i class="fas fa-mountain mr-2"></i>景山公园看故宫全景
+                            <i class="fas fa-external-link-alt ml-2 text-sm"></i>
+                        </div>
+                    </div>
+                    <div class="timeline-item">
+                        <div class="font-semibold text-red-600">19:30</div>
+                        <div class="text-gray-700 nav-location" onclick="openNavigation('天安门广场')">
+                            <i class="fas fa-mountain mr-2"></i>天安门降旗仪式
+                            <i class="fas fa-external-link-alt ml-2 text-sm"></i>
+                        </div>
+                    </div>
+                </div>
+            </div>
+
+            <!-- 6月19日 -->
+            <div class="card bg-white rounded-2xl p-6">
+                <div class="bg-gradient-to-r from-green-500 to-teal-500 text-white rounded-xl p-4 mb-4">
+                    <h3 class="text-xl font-bold">6月19日 周四</h3>
+                    <p class="opacity-90">颐和园・清华大学</p>
+                </div>
+                <div class="space-y-4">
+                    <div class="timeline-item">
+                        <div class="font-semibold text-green-600">8:00</div>
+                        <div class="text-gray-700">北京交通大学出发</div>
+                        <div class="text-sm text-gray-500 mt-1">651路→563路 (约1小时12分钟)</div>
+                    </div>
+                    <div class="timeline-item">
+                        <div class="font-semibold text-green-600">9:30</div>
+                        <div class="text-gray-700 nav-location" onclick="openNavigation('颐和园')">
+                            <i class="fas fa-leaf mr-2"></i>颐和园 (4小时)
+                            <i class="fas fa-external-link-alt ml-2 text-sm"></i>
+                        </div>
+                    </div>
+                    <div class="timeline-item">
+                        <div class="font-semibold text-green-600">15:00</div>
+                        <div class="text-gray-700 nav-location" onclick="openNavigation('清华大学')">
+                            <i class="fas fa-university mr-2"></i>清华大学
+                            <i class="fas fa-external-link-alt ml-2 text-sm"></i>
+                        </div>
+                    </div>
+                    <div class="timeline-item">
+                        <div class="font-semibold text-green-600">18:30</div>
+                        <div class="text-gray-700">清华大学周边晚餐</div>
+                    </div>
+                </div>
+            </div>
+
+            <!-- 6月20日 -->
+            <div class="card bg-white rounded-2xl p-6">
+                <div class="bg-gradient-to-r from-blue-500 to-indigo-500 text-white rounded-xl p-4 mb-4">
+                    <h3 class="text-xl font-bold">6月20日 周五</h3>
+                    <p class="opacity-90">毕业典礼・万里长城</p>
+                </div>
+                <div class="space-y-4">
+                    <div class="timeline-item">
+                        <div class="font-semibold text-blue-600">9:00</div>
+                        <div class="text-gray-700">
+                            <i class="fas fa-graduation-cap mr-2"></i>北京交通大学毕业典礼
+                        </div>
+                    </div>
+                    <div class="timeline-item">
+                        <div class="font-semibold text-blue-600">13:30</div>
+                        <div class="text-gray-700">前往八达岭长城</div>
+                        <div class="text-sm text-gray-500 mt-1">375路→21路→877路 (约2小时30分钟)</div>
+                    </div>
+                    <div class="timeline-item">
+                        <div class="font-semibold text-blue-600">16:00</div>
+                        <div class="text-gray-700 nav-location" onclick="openNavigation('八达岭长城')">
+                            <i class="fas fa-mountain mr-2"></i>八达岭长城 (3小时)
+                            <i class="fas fa-external-link-alt ml-2 text-sm"></i>
+                        </div>
+                    </div>
+                    <div class="timeline-item">
+                        <div class="font-semibold text-blue-600">19:00</div>
+                        <div class="text-gray-700">铜锅涮肉</div>
+                    </div>
+                </div>
+            </div>
+
+            <!-- 6月21日 -->
+            <div class="card bg-white rounded-2xl p-6">
+                <div class="bg-gradient-to-r from-yellow-500 to-orange-500 text-white rounded-xl p-4 mb-4">
+                    <h3 class="text-xl font-bold">6月21日 周六</h3>
+                    <p class="opacity-90">天坛・雍和宫</p>
+                </div>
+                <div class="space-y-4">
+                    <div class="timeline-item">
+                        <div class="font-semibold text-yellow-600">9:00</div>
+                        <div class="text-gray-700 nav-location" onclick="openNavigation('天坛公园')">
+                            <i class="fas fa-sun mr-2"></i>恭王府博物馆
+                            <i class="fas fa-external-link-alt ml-2 text-sm"></i>
+                        </div>
+                    </div>
+                    <div class="timeline-item">
+                        <div class="font-semibold text-yellow-600">11:00</div>
+                        <div class="text-gray-700 nav-location" onclick="openNavigation('雍和宫')">
+                            <i class="fas fa-pray mr-2"></i>雍和宫
+                            <i class="fas fa-external-link-alt ml-2 text-sm"></i>
+                        </div>
+                    </div>
+                    <div class="timeline-item">
+                        <div class="font-semibold text-yellow-600">15:00</div>
+                        <div class="text-gray-700 nav-location" onclick="openNavigation('南锣鼓巷')">
+                            <i class="fas fa-store mr-2"></i>南锣鼓巷文化街区
+                            <i class="fas fa-external-link-alt ml-2 text-sm"></i>
+                        </div>
+                    </div>
+                </div>
+            </div>
+
+            <!-- 地图区域 -->
+            <div class="card bg-white rounded-2xl p-6">
+                <h3 class="text-xl font-bold mb-4">
+                    <i class="fas fa-map mr-3 text-blue-500"></i>景点位置地图
+                </h3>
+                <div id="map" class="map-container"></div>
+            </div>
+
+        </div>
+
+        <!-- 实用信息卡片 -->
+        <div class="grid grid-cols-1 md:grid-cols-2 gap-6">
+            
+            <!-- 交通信息 -->
+            <div class="card bg-white rounded-2xl p-6">
+                <h3 class="text-xl font-bold mb-4 text-blue-600">
+                    <i class="fas fa-subway mr-3"></i>交通信息
+                </h3>
+                <div class="space-y-3">
+                    <div class="bg-blue-50 rounded-lg p-3">
+                        <div class="font-semibold text-blue-800">地铁卡购买</div>
+                        <div class="text-sm text-gray-600">建议购买北京市政交通一卡通，可乘坐地铁、公交</div>
+                    </div>
+                    <div class="bg-green-50 rounded-lg p-3">
+                        <div class="font-semibold text-green-800">公交支付</div>
+                        <div class="text-sm text-gray-600">支持微信、支付宝扫码支付，也可使用交通卡</div>
+                    </div>
+                    <div class="bg-purple-50 rounded-lg p-3">
+                        <div class="font-semibold text-purple-800">打车软件</div>
+                        <div class="text-sm text-gray-600">推荐使用滴滴出行、高德打车</div>
+                    </div>
+                </div>
+            </div>
+
+            <!-- 重要提醒 -->
+            <div class="card bg-white rounded-2xl p-6">
+                <h3 class="text-xl font-bold mb-4 text-orange-600">
+                    <i class="fas fa-exclamation-circle mr-3"></i>重要提醒
+                </h3>
+                <div class="space-y-3">
+                    <div class="bg-red-50 rounded-lg p-3">
+                        <div class="font-semibold text-red-800">紧急联系</div>
+                        <div class="text-sm text-gray-600">火警119 | 报警110 | 急救120</div>
+                    </div>
+                    <div class="bg-orange-50 rounded-lg p-3">
+                        <div class="font-semibold text-orange-800">景点门票</div>
+                        <div class="text-sm text-gray-600">故宫需提前网上预约，建议提前3-5天预订</div>
+                    </div>
+                    <div class="bg-yellow-50 rounded-lg p-3">
+                        <div class="font-semibold text-yellow-800">行李提醒</div>
+                        <div class="text-sm text-gray-600">防晒用品、舒适的步行鞋、充电宝</div>
+                    </div>
+                </div>
+            </div>
+        </div>
+
+        <!-- 预算摘要 -->
+        <div class="card bg-gradient-to-r from-green-400 to-blue-500 text-white rounded-2xl p-6">
+            <h3 class="text-2xl font-bold mb-6">
+                <i class="fas fa-money-bill-wave mr-3"></i>预算参考
+            </h3>
+            <div class="grid grid-cols-1 md:grid-cols-4 gap-6">
+                <div class="text-center">
+                    <div class="text-3xl font-bold">¥100</div>
+                    <div class="opacity-90">交通费用/人</div>
+                </div>
+                <div class="text-center">
+                    <div class="text-3xl font-bold">¥50</div>
+                    <div class="opacity-90">景点门票/人</div>
+                </div>
+                <div class="text-center">
+                    <div class="text-3xl font-bold">¥200</div>
+                    <div class="opacity-90">餐饮费用/人</div>
+                </div>
+                <div class="text-center">
+                    <div class="text-3xl font-bold">¥350</div>
+                    <div class="opacity-90">总计/人</div>
+                </div>
+            </div>
+        </div>
+
+    </div>
+
+    <footer class="bg-gray-800 text-white py-8 mt-12">
+        <div class="container mx-auto px-4 text-center">
+            <p class="text-lg mb-2">
+                <i class="fas fa-heart text-red-500 mr-2"></i>
+                祝在北京度过愉快的时光！
+            </p>
+            <p class="text-gray-400">旅行计划制定于 2025年6月，请根据实际情况调整行程安排</p>
+        </div>
+    </footer>
+
+    <script src="https://unpkg.com/leaflet@1.9.4/dist/leaflet.js" integrity="sha256-20nQCchB9co0qIjJZRGuk2/Z9VM+kNiyxNV1lvTlZBo=" crossorigin=""></script>
+    
+    <script>
+        // 地图初始化
+        var map = L.map('map').setView([39.9, 116.4], 10);
+        
+        L.tileLayer('https://{s}.tile.openstreetmap.org/{z}/{x}/{y}.png', {
+            attribution: '© OpenStreetMap contributors'
+        }).addTo(map);
+
+        // 添加景点标记
+        var locations = [
+            {name: "北京交通大学", lat: 39.952270, lng: 116.342835, color: "red"},
+            {name: "天安门广场", lat: 39.903179, lng: 116.397755, color: "blue"},
+            {name: "故宫博物院", lat: 39.917839, lng: 116.397029, color: "blue"},
+            {name: "颐和园", lat: 39.999617, lng: 116.275179, color: "green"},
+            {name: "清华大学", lat: 40.003213, lng: 116.326936, color: "green"},
+            {name: "八达岭长城", lat: 40.356188, lng: 116.016802, color: "orange"}
+        ];
+
+        locations.forEach(function(location) {
+            var marker = L.marker([location.lat, location.lng]).addTo(map);
+            marker.bindPopup('<b>' + location.name + '</b>').openPopup();
+        });
+
+        // 导航功能
+        function openNavigation(destination) {
+            var userAgent = navigator.userAgent || navigator.vendor || window.opera;
+            
+            if (/android/i.test(userAgent)) {
+                // Android 设备使用高德地图
+                window.open(`androidamap://route?sourceApplication=webapp&dname=${encodeURIComponent(destination)}&dev=0`);
+            } else if (/iPad|iPhone|iPod/.test(userAgent) && !window.MSStream) {
+                // iOS 设备使用高德地图
+                window.open(`iosamap://route?sourceApplication=webapp&dname=${encodeURIComponent(destination)}&dev=0`);
+            } else {
+                // PC 设备使用高德地图网页版
+                window.open(`https://www.amap.com/search?query=${encodeURIComponent(destination)}`);
+            }
+        }
+
+        // 添加平滑滚动效果
+        document.addEventListener('DOMContentLoaded', function() {
+            const cards = document.querySelectorAll('.card');
+            
+            const observer = new IntersectionObserver(function(entries) {
+                entries.forEach(function(entry) {
+                    if (entry.isIntersecting) {
+                        entry.target.style.opacity = '1';
+                        entry.target.style.transform = 'translateY(0)';
+                    }
+                });
+            });
+            
+            cards.forEach(function(card) {
+                card.style.opacity = '0';
+                card.style.transform = 'translateY(20px)';
+                card.style.transition = 'opacity 0.6s ease, transform 0.6s ease';
+                observer.observe(card);
+            });
+        });
+    </script>
+</body>
+</html> 
